@@ -3,18 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reproductor Aurora</title>
+  <title>Equipo Aurora — Good Boy Devs</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="player-container">
-    <h1>Reproductor “Aurora”</h1>
-    <audio id="audioPlayer" controls preload="metadata">
-      <source src="Aurora.mp3" type="audio/mpeg">
-      Tu navegador no soporta el elemento de audio.
-    </audio>
-    <div id="playCountDiv">Reproducciones: <span id="playCount">0</span></div>
-  </div>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="#" class="logo">Good Boy Devs</a>
+      <a href="#" class="logo secondary">Equipo Aurora</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="#home">Inicio</a></li>
+          <li><a href="#about">Sobre Nosotros</a></li>
+          <li><a href="#services">Servicios</a></li>
+          <li><a href="#contact">Contacto</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section id="home" class="hero">
+    <div class="overlay"></div>
+    <div class="content">
+      <h1>Bienvenidos a Equipo Aurora</h1>
+      <p>Fusionamos ingeniería eléctrica con tecnología sostenible moderna.</p>
+      <blockquote id="quote">“Innovar para un futuro energético más limpio.”</blockquote>
+    </div>
+  </section>
+
+  <section id="about" class="section-light">
+    <h2>Sobre Nosotros</h2>
+    <p>Nos apasiona la tecnología verde y la innovación:</p>
+    <ul>
+      <li>Sistemas empotrados & IoT</li>
+      <li>Diseño de energías renovables</li>
+      <li>Ciberseguridad para infraestructura crítica</li>
+      <li>Soluciones Cloud & DevOps</li>
+    </ul>
+  </section>
+
+  <section id="services" class="section-dark">
+    <h2>Servicios</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>Diseño de microredes</h3>
+        <p>Optimización solar, eólica y almacenamiento.</p>
+      </div>
+      <div class="card">
+        <h3>Ingeniería de firmware</h3>
+        <p>Código robusto para placas STM32, ARM y RISC-V.</p>
+      </div>
+      <div class="card">
+        <h3>Auditorías de seguridad</h3>
+        <p>Identificamos vulnerabilidades antes de que sean explotadas.</p>
+      </div>
+      <div class="card">
+        <h3>Automatización Cloud</h3>
+        <p>Desplegamos infraestructura escalable con IaC.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="audio-player" class="section-light player-section">
+    <h2>Reproductor “Aurora”</h2>
+    <div class="player-container">
+      <audio id="audioPlayer" controls preload="metadata">
+        <source src="Aurora.mp3" type="audio/mpeg">
+        Tu navegador no soporta el elemento de audio.
+      </audio>
+      <div id="playCountDiv" class="play-count">Reproducciones: <span id="playCount">0</span></div>
+    </div>
+  </section>
+
+  <footer id="contact" class="site-footer">
+    <p>&copy; <span id="year"></span> Good Boy Devs — Equipo Aurora</p>
+    <p>Correo: <a href="mailto:info@goodboydevs.com">info@goodboydevs.com</a></p>
+  </footer>
 
   <script src="script.js"></script>
 </body>
