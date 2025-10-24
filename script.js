@@ -59,6 +59,18 @@ if (audio && playCountEl && playCountDiv) {
     // 3️⃣ Actualizar texto visible
     playCountEl.textContent = playCount;
 
+    // Actualizar contador global en el servidor
+fetch("http://127.0.0.1:5000/update_count", { method: "POST" })
+  .then(response => response.json())
+  .then(data => {
+    console.log("Total global:", data.reproducciones);
+    // Mostrar también el contador global si lo deseas:
+    const totalDiv = document.getElementById("totalGlobal");
+    if (totalDiv) totalDiv.textContent = `Total global: ${data.reproducciones}`;
+  })
+  .catch(err => console.error("Error al actualizar el contador global:", err));
+
+
     // 4️⃣ Activar animaciones visuales (efecto “tuanis”)
     //    Clase .playing -> brillo en el reproductor
     //    Clase .updated -> agranda temporalmente el número
