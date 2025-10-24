@@ -1,42 +1,20 @@
-// File: index.html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Equipo Aurora</title>
+  <title>Reproductor Aurora</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header>
-    <a href="#" class="logo">Equipo Aurora</a>
-    <nav>
-      <ul>
-        <li><a href="#home">Home</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#services">Services</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-    </nav>
-    <button class="menu-toggle">☰</button>
-  </header>
-
-  <section id="home" class="hero">
-    <div class="overlay"></div>
-    <div class="content">
-      <h1>Welcome to Equipo Aurora</h1>
-      <p>Fusing electrical engineering progress with modern, sustainable technology.</p>
-      <blockquote id="quote"></blockquote>
-    </div>
-  </section>
-
- 
-
- 
-  <footer id="contact">
-    <p>&copy; <span id="year"></span> Good Boy Devs</p>
-    <p>Email us at <a href="com">info@goodboydevs.com</a></p>
-  </footer>
+  <div class="player-container">
+    <h1>Reproductor “Aurora”</h1>
+    <audio id="audioPlayer" controls preload="metadata">
+      <source src="Aurora.mp3" type="audio/mpeg">
+      Tu navegador no soporta el elemento de audio.
+    </audio>
+    <div id="playCountDiv">Reproducciones: <span id="playCount">0</span></div>
+  </div>
 
   <script src="script.js"></script>
 </body>
