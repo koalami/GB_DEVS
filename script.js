@@ -55,37 +55,46 @@ async function getGlobalCount() {
   }
 }
 
-// Función para solicitar una actualización al workflow
+// --- 🔁 Función para disparar el workflow que actualiza el contador ---
 async function triggerWorkflow() {
+  const username = "koalami";
+  const repo = "GB_DEVS";
+  const branch = "main";
+  const workflowFile = "update-counter.yml";
+
+  // ⚠️ Token guardado como secreto en tu repositorio (GH_TOKEN)
+  const token = "TU_TOKEN_SECRETO"; // No lo pongas directo aquí en producción
+
+  const apiUrl = `https://api.github.com/repos/${username}/${repo}/actions/workflows/${workflowFile}/dispatches`;
+
   try {
-    // ⚠️ Necesitas agregar tu token como Secret en el repositorio
-    const token = "TU_TOKEN_SECRETO"; // o usa una variable oculta del entorno
-
-    const workflowUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/actions/workflows/update-counter.yml/dispatches`;
-
-    const response = await fetch(workflowUrl, {
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
         "Accept": "application/vnd.github+json",
         "Authorization": `Bearer ${token}`,
       },
       body: JSON.stringify({
-        ref: GITHUB_BRANCH,
-        inputs: { increment: "1" }
+        ref: branch,
+        inputs: {
+          increment: "1"
+        }
       })
     });
 
     if (response.ok) {
-      console.log("✅ Workflow ejecutado correctamente");
-      // Esperar unos segundos para que se actualice el JSON
-      setTimeout(getGlobalCount, 5000);
+      console.log("✅ Workflow ejecutado correctamente.");
+      // Esperamos unos segundos para que el JSON se actualice y lo recargamos
+      setTimeout(getGlobalCount, 6000);
     } else {
-      console.error("❌ Error al ejecutar workflow:", await response.text());
+      const error = await response.text();
+      console.error("❌ Error al ejecutar el workflow:", error);
     }
   } catch (err) {
     console.error("Error en triggerWorkflow:", err);
   }
 }
+
 
 // --- Inicialización y lógica de reproducción ---
 if (audio && playCountEl && playCountDiv) {
