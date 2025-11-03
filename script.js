@@ -2,7 +2,7 @@
 // 🟣 EQUIPO AURORA – SCRIPT BASE
 // ==============================
 
-// --- MENÚ MÓVIL (si existe botón .menu-toggle)
+// --- MENÚ MÓVIL ---
 const menuBtn = document.querySelector('.menu-toggle');
 const nav = document.querySelector('nav');
 if (menuBtn && nav) {
@@ -36,15 +36,15 @@ const playCountEl = document.getElementById('playCount');
 const playCountDiv = document.getElementById('playCountDiv');
 const totalDiv = document.getElementById('totalGlobal');
 
-// --- CONFIGURACIÓN DEL REPO PARA GITHUB ACTIONS ---
+// --- CONFIGURACIÓN DEL REPO ---
 const GITHUB_USERNAME = "koalami";
 const GITHUB_REPO = "GB_DEVS";
 const GITHUB_BRANCH = "main";
 
-// URL pública del JSON (servido por GitHub Pages)
+// URL pública del JSON en GitHub Pages
 const COUNTER_URL = `https://${GITHUB_USERNAME}.github.io/${GITHUB_REPO}/counter.json`;
 
-// Función para obtener el valor actual del contador global
+// --- Obtener contador global ---
 async function getGlobalCount() {
   try {
     const res = await fetch(COUNTER_URL);
@@ -55,30 +55,28 @@ async function getGlobalCount() {
   }
 }
 
+// --- Disparar actualización segura (gatillo) ---
 async function triggerSafeUpdate() {
   const username = "koalami";
   const repo = "GB_DEVS";
   const branch = "main";
-
   const filePath = "update_trigger.json";
   const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${filePath}`;
 
   try {
-    // 1️⃣ Obtiene el archivo actual (para saber el SHA)
+    // 1️⃣ Obtener el archivo actual (para su SHA)
     const res = await fetch(apiUrl);
     const fileData = await res.json();
 
-    // 2️⃣ Genera un valor aleatorio para cambiar el archivo
-    const newContent = {
-      last_trigger: Date.now()
-    };
+    // 2️⃣ Crear nuevo contenido con timestamp
+    const newContent = { last_trigger: Date.now() };
 
-    // 3️⃣ Actualiza el archivo con una nueva marca de tiempo
+    // 3️⃣ Actualizar el archivo en GitHub (esto activa el workflow)
     await fetch(apiUrl, {
       method: "PUT",
       headers: {
         "Accept": "application/vnd.github+json",
-        "Authorization": `Bearer TU_TOKEN_SOLO_EN_ACCIONES`, // o un PAT temporal en desarrollo
+        "Authorization": `Bearer TU_TOKEN_TEMPORAL`, // Solo en desarrollo, en producción el workflow se ejecuta automáticamente
       },
       body: JSON.stringify({
         message: "Trigger update",
@@ -89,52 +87,34 @@ async function triggerSafeUpdate() {
     });
 
     console.log("🔁 Gatillo activado correctamente.");
+
+    // Espera unos segundos y actualiza el valor global
+    setTimeout(getGlobalCount, 6000);
   } catch (err) {
     console.error("Error al activar el gatillo:", err);
   }
 }
 
-    if (response.ok) {
-      console.log("✅ Workflow ejecutado correctamente.");
-      // Esperamos unos segundos para que el JSON se actualice y lo recargamos
-      setTimeout(getGlobalCount, 6000);
-    } else {
-      const error = await response.text();
-      console.error("❌ Error al ejecutar el workflow:", error);
-    }
-  } catch (err) {
-    console.error("Error en triggerWorkflow:", err);
-  }
-}
-
-
 // --- Inicialización y lógica de reproducción ---
 if (audio && playCountEl && playCountDiv) {
-  // Leer el contador local
   let playCount = parseInt(localStorage.getItem('auroraPlayCount') || '0', 10);
 
-  // Mostrar el valor actual
+  // Mostrar valores iniciales
   playCountEl.textContent = playCount;
-  getGlobalCount(); // Muestra el valor global al cargar
+  getGlobalCount();
 
-  // --- Evento: cuando se da "play" al audio ---
+  // --- Evento: reproducir audio ---
   audio.addEventListener('play', () => {
-    // 1️⃣ Aumentar contador local
     playCount++;
-
-    // 2️⃣ Guardar nuevo valor
     localStorage.setItem('auroraPlayCount', playCount);
-
-    // 3️⃣ Mostrar texto actualizado
     playCountEl.textContent = playCount;
 
-    // 4️⃣ Disparar actualización del contador global
-    triggerWorkflow();
+    // 🔥 Dispara la actualización global segura
+    triggerSafeUpdate();
 
-    // 5️⃣ Animaciones visuales (efecto “tuanis”)
+    // ✨ Animación visual
     audio.classList.add('playing');
     playCountDiv.classList.add('updated');
-
     setTimeout(() => {
       audio.classList.remove('playing');
       playCountDiv.classList.remove('updated');
