@@ -71,17 +71,26 @@ async function triggerSafeUpdate() {
     // 2️⃣ Crear nuevo contenido con timestamp
     const newContent = { last_trigger: Date.now() };
 
-    // 3️⃣ Actualizar el archivo en GitHub (esto activa el workflow)
-    
-    await fetch(apiUrl, { method: "POST" });
-    console.log("🔁 Gatillo activado correctamente en Vercel.");
+   // --- Disparar actualización segura (a través de Vercel) ---
+async function triggerSafeUpdate() {
+  const apiUrl = "https://gb-devs.vercel.app/api/updateCounter"; // ⚠️ cambia esto si tu dominio Vercel es distinto
 
-    // Espera unos segundos y actualiza el valor global
-    setTimeout(getGlobalCount, 6000);
+  try {
+    const response = await fetch(apiUrl, { method: "POST" });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("❌ Error al contactar API Vercel:", errorText);
+    } else {
+      console.log("🔁 Gatillo activado correctamente vía Vercel");
+      // Espera unos segundos para que el workflow en GitHub actualice el contador.json
+      setTimeout(getGlobalCount, 8000);
+    }
   } catch (err) {
-    console.error("Error al activar el gatillo:", err);
+    console.error("Error al activar el gatillo en Vercel:", err);
   }
 }
+
 
 // --- Inicialización y lógica de reproducción ---
 if (audio && playCountEl && playCountDiv) {
