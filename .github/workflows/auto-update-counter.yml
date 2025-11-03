@@ -1,9 +1,10 @@
 name: Secure Counter Auto-Update
 
 on:
+  workflow_dispatch:    # 🔹 Permite ejecutarlo desde un POST API o manualmente
   push:
     paths:
-      - "update_trigger.json"  # Solo se ejecuta cuando este archivo cambia
+      - "update_trigger.json"
 
 permissions:
   contents: write
@@ -26,5 +27,5 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git add $FILE
-          git commit -m "Auto-increment to $NEW_VALUE"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
+          git commit -m "Auto-increment to $NEW_VALUE" || echo "No changes to commit"
+          git push
