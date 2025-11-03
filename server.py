@@ -6,7 +6,7 @@ app = Flask(__name__)
 CORS(app)  # habilita CORS para que GitHub Pages pueda acceder
 
 # Nombre del archivo donde guardamos el contador
-COUNT_FILE = "contador.json"
+COUNT_FILE = "counter.json"
 
 # Función auxiliar: leer el contador actual
 def leer_contador():
