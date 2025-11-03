@@ -61,7 +61,7 @@ async function triggerSafeUpdate() {
   const repo = "GB_DEVS";
   const branch = "main";
   const filePath = "update_trigger.json";
-  const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${filePath}`;
+  const apiUrl = "https://tusitio.vercel.app/api/updateCounter";
 
   try {
     // 1️⃣ Obtener el archivo actual (para su SHA)
@@ -72,21 +72,9 @@ async function triggerSafeUpdate() {
     const newContent = { last_trigger: Date.now() };
 
     // 3️⃣ Actualizar el archivo en GitHub (esto activa el workflow)
-    await fetch(apiUrl, {
-      method: "PUT",
-      headers: {
-        "Accept": "application/vnd.github+json",
-        "Authorization": `Bearer TU_TOKEN_TEMPORAL`, // Solo en desarrollo, en producción el workflow se ejecuta automáticamente
-      },
-      body: JSON.stringify({
-        message: "Trigger update",
-        content: btoa(JSON.stringify(newContent, null, 2)),
-        sha: fileData.sha,
-        branch
-      })
-    });
-
-    console.log("🔁 Gatillo activado correctamente.");
+    
+    await fetch(apiUrl, { method: "POST" });
+    console.log("🔁 Gatillo activado correctamente en Vercel.");
 
     // Espera unos segundos y actualiza el valor global
     setTimeout(getGlobalCount, 6000);
