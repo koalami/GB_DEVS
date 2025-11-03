@@ -3,7 +3,7 @@ name: Secure Counter Auto-Update
 on:
   push:
     paths:
-      - "update_trigger.json"  # se ejecuta solo cuando se modifica este archivo
+      - "update_trigger.json"  # Solo se ejecuta cuando este archivo cambia
 
 permissions:
   contents: write
