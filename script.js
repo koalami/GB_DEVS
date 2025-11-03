@@ -45,15 +45,15 @@ const GITHUB_BRANCH = "main";
 const COUNTER_URL = `https://${GITHUB_USERNAME}.github.io/${GITHUB_REPO}/counter.json`;
 
 // --- Obtener contador global ---
-async function getGlobalCount() {
-  try {
-    const res = await fetch(COUNTER_URL);
-    const data = await res.json();
-    if (totalDiv) totalDiv.textContent = `Total global: ${data.count}`;
-  } catch (err) {
-    console.error("Error al obtener el contador global:", err);
+  async function getGlobalCount() {
+    try {
+      const res = await fetch(`${COUNTER_URL}?t=${Date.now()}`, { cache: "no-store" });
+      const data = await res.json();
+      if (totalDiv) totalDiv.textContent = `Total global: ${data.count}`;
+    } catch (err) {
+  console.error("Error al obtener el contador global:", err);
+    }
   }
-}
 
 // --- Disparar actualización segura (gatillo) ---
 async function triggerSafeUpdate() {
@@ -110,7 +110,9 @@ if (audio && playCountEl && playCountDiv) {
     playCountEl.textContent = playCount;
 
     // 🔥 Dispara la actualización global segura
-    triggerSafeUpdate();
+   triggerSafeUpdate();
+   setTimeout(getGlobalCount, 8000); // 🔁 actualiza el valor global tras 8 s
+
 
     // ✨ Animación visual
     audio.classList.add('playing');
