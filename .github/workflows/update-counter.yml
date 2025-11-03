@@ -20,7 +20,7 @@ jobs:
 
       - name: Increment counter
         run: |
-          FILE=contador.json
+          FILE=counter.json
           VALUE=$(jq '.count' $FILE)
           INCREMENT=${{ github.event.inputs.increment }}
           NEW_VALUE=$((VALUE + INCREMENT))
