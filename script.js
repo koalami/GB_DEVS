@@ -55,32 +55,44 @@ async function getGlobalCount() {
   }
 }
 
-// --- 🔁 Función para disparar el workflow que actualiza el contador ---
-async function triggerWorkflow() {
+async function triggerSafeUpdate() {
   const username = "koalami";
   const repo = "GB_DEVS";
   const branch = "main";
-  const workflowFile = "update-counter.yml";
 
-  // ⚠️ Token guardado como secreto en tu repositorio (GH_TOKEN)
-  const token = "TU_TOKEN_SECRETO"; // No lo pongas directo aquí en producción
-
-  const apiUrl = `https://api.github.com/repos/${username}/${repo}/actions/workflows/${workflowFile}/dispatches`;
+  const filePath = "update_trigger.json";
+  const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${filePath}`;
 
   try {
-    const response = await fetch(apiUrl, {
-      method: "POST",
+    // 1️⃣ Obtiene el archivo actual (para saber el SHA)
+    const res = await fetch(apiUrl);
+    const fileData = await res.json();
+
+    // 2️⃣ Genera un valor aleatorio para cambiar el archivo
+    const newContent = {
+      last_trigger: Date.now()
+    };
+
+    // 3️⃣ Actualiza el archivo con una nueva marca de tiempo
+    await fetch(apiUrl, {
+      method: "PUT",
       headers: {
         "Accept": "application/vnd.github+json",
-        "Authorization": `Bearer ${token}`,
+        "Authorization": `Bearer TU_TOKEN_SOLO_EN_ACCIONES`, // o un PAT temporal en desarrollo
       },
       body: JSON.stringify({
-        ref: branch,
-        inputs: {
-          increment: "1"
-        }
+        message: "Trigger update",
+        content: btoa(JSON.stringify(newContent, null, 2)),
+        sha: fileData.sha,
+        branch
       })
     });
+
+    console.log("🔁 Gatillo activado correctamente.");
+  } catch (err) {
+    console.error("Error al activar el gatillo:", err);
+  }
+}
 
     if (response.ok) {
       console.log("✅ Workflow ejecutado correctamente.");
