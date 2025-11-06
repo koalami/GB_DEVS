@@ -190,19 +190,32 @@ document.addEventListener('DOMContentLoaded', () => {
   
   console.log('🌟 Equipo Aurora cargado correctamente');
 
-
-
-
-
-
-const socket = io("https://aurora-signaling.onrender.com");
-socket.on("connect", () => {
-  console.log("🟢 Conectado al servidor de señalización");
-
-
-
-
-
-
-  
 });
+
+// ==============================
+// 🌐 CONEXIÓN AL SERVIDOR DE SEÑALIZACIÓN (Render)
+// ==============================
+
+// URL de tu backend en Render (ajústala si cambia)
+const SIGNALING_URL = "https://aurora-signaling.onrender.com"; 
+
+// Inicializa conexión WebSocket
+const socket = io(SIGNALING_URL);
+
+// Evento: cuando se conecta correctamente
+socket.on("connect", () => {
+  console.log("🟢 Conectado al servidor de señalización:", SIGNALING_URL);
+  // Podés unir a una sala de prueba
+  socket.emit("join", "sala-prueba");
+});
+
+// Evento: cuando se desconecta
+socket.on("disconnect", () => {
+  console.log("🔴 Desconectado del servidor de señalización");
+});
+
+// Evento: mensajes de prueba (opcional)
+socket.on("message", (data) => {
+  console.log("📩 Mensaje recibido:", data);
+});
+
