@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
 const socket = io("https://aurora-signaling.onrender.com");
 socket.on("connect", () => {
   console.log("🟢 Conectado al servidor de señalización");
-}
+
 
 
 
