@@ -195,86 +195,107 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==============================
 // 🌐 CONEXIÓN AL SERVIDOR DE SEÑALIZACIÓN (Render)
 // ==============================
+function initVideoCall() {
+  const SIGNALING_URL = "https://gb-devs.onrender.com";
+  const socket = io(SIGNALING_URL);
 
-const SIGNALING_URL = "https://gb-devs.onrender.com";
-const socket = io(SIGNALING_URL);
+  const localVideo = document.getElementById("localVideo");
+  const remoteVideo = document.getElementById("remoteVideo");
+  const joinBtn = document.getElementById("joinBtn");
+  const roomInput = document.getElementById("roomInput");
 
-const localVideo = document.getElementById("localVideo");
-const remoteVideo = document.getElementById("remoteVideo");
-const joinBtn = document.getElementById("joinBtn");
-const roomInput = document.getElementById("roomInput");
+  if (!joinBtn || !localVideo || !remoteVideo) {
+    console.warn("⚠️ Elementos de videollamada no encontrados en el DOM.");
+    return;
+  }
 
-let localStream;
-let peerConnection;
-let room;
+  let localStream;
+  let peerConnection;
+  let room;
 
-// Configuración básica STUN (de Google)
-const config = {
-  iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
-};
-
-joinBtn.addEventListener("click", async () => {
-  room = roomInput.value || "default";
-  socket.emit("join", room);
-
-  localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-  localVideo.srcObject = localStream;
-
-  peerConnection = new RTCPeerConnection(config);
-  localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-
-  peerConnection.ontrack = (event) => {
-    remoteVideo.srcObject = event.streams[0];
+  const config = {
+    iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
   };
 
-  peerConnection.onicecandidate = (event) => {
-    if (event.candidate) {
-      socket.emit("candidate", { room, candidate: event.candidate });
-    }
-  };
-
-  // Escuchar eventos de señalización
-  socket.on("ready", async () => {
-    const offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer);
-    socket.emit("offer", { room, offer });
-  });
-
-  socket.on("offer", async (data) => {
-    await peerConnection.setRemoteDescription(new RTCSessionDescription(data));
-    const answer = await peerConnection.createAnswer();
-    await peerConnection.setLocalDescription(answer);
-    socket.emit("answer", { room, answer });
-  });
-
-  socket.on("answer", async (data) => {
-    await peerConnection.setRemoteDescription(new RTCSessionDescription(data));
-  });
-
-  socket.on("candidate", async (data) => {
+  joinBtn.addEventListener("click", async () => {
     try {
-      await peerConnection.addIceCandidate(data);
+      room = roomInput.value || "default";
+      socket.emit("join", room);
+
+      // Pedir acceso a cámara y micrófono
+      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      localVideo.srcObject = localStream;
+
+      // Crear conexión RTCPeer
+      peerConnection = new RTCPeerConnection(config);
+      localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+      peerConnection.ontrack = (event) => {
+        remoteVideo.srcObject = event.streams[0];
+      };
+
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+          socket.emit("candidate", { room, candidate: event.candidate });
+        }
+      };
+
+      // --- Señalización WebRTC ---
+      socket.on("ready", async () => {
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        socket.emit("offer", { room, offer });
+      });
+
+      socket.on("offer", async (data) => {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data));
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+        socket.emit("answer", { room, answer });
+      });
+
+      socket.on("answer", async (data) => {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data));
+      });
+
+      socket.on("candidate", async (data) => {
+        try {
+          await peerConnection.addIceCandidate(data);
+        } catch (err) {
+          console.error("Error añadiendo candidato ICE:", err);
+        }
+      });
+
     } catch (err) {
-      console.error("Error añadiendo candidato ICE:", err);
+      console.error("Error al iniciar videollamada:", err);
+      alert("⚠️ No se pudo acceder a la cámara/micrófono o conectar al servidor.");
     }
   });
-});
 
+  // --- Eventos de conexión ---
+  socket.on("connect", () => {
+    console.log("🟢 Conectado al servidor de señalización:", SIGNALING_URL);
+  });
 
-// Evento: cuando se conecta correctamente
-socket.on("connect", () => {
-  console.log("🟢 Conectado al servidor de señalización:", SIGNALING_URL);
-  // Podés unir a una sala de prueba
-  socket.emit("join", "sala-prueba");
-});
+  socket.on("disconnect", () => {
+    console.log("🔴 Desconectado del servidor de señalización");
+  });
 
-// Evento: cuando se desconecta
-socket.on("disconnect", () => {
-  console.log("🔴 Desconectado del servidor de señalización");
-});
+  socket.on("message", (data) => {
+    console.log("📩 Mensaje recibido:", data);
+  });
+}
+document.addEventListener('DOMContentLoaded', () => {
+  createParticles();
+  initHeaderScroll();
+  initFadeInAnimation();
+  initRandomQuote();
+  initFooterYear();
+  AudioPlayer.init();
 
-// Evento: mensajes de prueba (opcional)
-socket.on("message", (data) => {
-  console.log("📩 Mensaje recibido:", data);
+  // 👇 Agrega esta línea
+  initVideoCall();
+
+  console.log('🌟 Equipo Aurora cargado correctamente');
 });
 
