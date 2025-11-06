@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==============================
 
 // URL de tu backend en Render (ajústala si cambia)
-const SIGNALING_URL = "https://aurora-signaling.onrender.com"; 
+const SIGNALING_URL = "https://gb-devs.onrender.com"; 
 
 // Inicializa conexión WebSocket
 const socket = io(SIGNALING_URL);
