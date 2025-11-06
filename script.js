@@ -196,11 +196,70 @@ document.addEventListener('DOMContentLoaded', () => {
 // 🌐 CONEXIÓN AL SERVIDOR DE SEÑALIZACIÓN (Render)
 // ==============================
 
-// URL de tu backend en Render (ajústala si cambia)
-const SIGNALING_URL = "https://gb-devs.onrender.com"; 
-
-// Inicializa conexión WebSocket
+const SIGNALING_URL = "https://gb-devs.onrender.com";
 const socket = io(SIGNALING_URL);
+
+const localVideo = document.getElementById("localVideo");
+const remoteVideo = document.getElementById("remoteVideo");
+const joinBtn = document.getElementById("joinBtn");
+const roomInput = document.getElementById("roomInput");
+
+let localStream;
+let peerConnection;
+let room;
+
+// Configuración básica STUN (de Google)
+const config = {
+  iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+};
+
+joinBtn.addEventListener("click", async () => {
+  room = roomInput.value || "default";
+  socket.emit("join", room);
+
+  localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  localVideo.srcObject = localStream;
+
+  peerConnection = new RTCPeerConnection(config);
+  localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+  peerConnection.ontrack = (event) => {
+    remoteVideo.srcObject = event.streams[0];
+  };
+
+  peerConnection.onicecandidate = (event) => {
+    if (event.candidate) {
+      socket.emit("candidate", { room, candidate: event.candidate });
+    }
+  };
+
+  // Escuchar eventos de señalización
+  socket.on("ready", async () => {
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+    socket.emit("offer", { room, offer });
+  });
+
+  socket.on("offer", async (data) => {
+    await peerConnection.setRemoteDescription(new RTCSessionDescription(data));
+    const answer = await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
+    socket.emit("answer", { room, answer });
+  });
+
+  socket.on("answer", async (data) => {
+    await peerConnection.setRemoteDescription(new RTCSessionDescription(data));
+  });
+
+  socket.on("candidate", async (data) => {
+    try {
+      await peerConnection.addIceCandidate(data);
+    } catch (err) {
+      console.error("Error añadiendo candidato ICE:", err);
+    }
+  });
+});
+
 
 // Evento: cuando se conecta correctamente
 socket.on("connect", () => {
