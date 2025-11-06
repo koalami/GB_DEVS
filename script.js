@@ -189,4 +189,20 @@ document.addEventListener('DOMContentLoaded', () => {
   AudioPlayer.init();
   
   console.log('🌟 Equipo Aurora cargado correctamente');
+
+
+
+
+
+
+const socket = io("https://aurora-signaling.onrender.com");
+socket.on("connect", () => {
+  console.log("🟢 Conectado al servidor de señalización");
+}
+
+
+
+
+
+  
 });
